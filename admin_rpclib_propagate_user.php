@@ -66,9 +66,10 @@ if (!$form->is_cancelled()) {
                         $output .= get_string('propagating', 'tool_mnetusers', fullname($userobj));
                         $userhost = $DB->get_record('mnet_host', array('id' => $USER->mnethostid));
                         $caller = new StdClass();
+                        $usermnethostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
                         $caller->username = $USER->username;
-                        $caller->remoteuserhostroot = $CFG->wwwroot;
-                        $caller->remotehostroot = $CFG->wwwroot;
+                        $caller->remoteuserhostroot = $usermnethostroot;
+                        $caller->remotehostroot = $usermnethostroot;
         
                         // check if exists
                         $exists = false;
@@ -93,11 +94,14 @@ if (!$form->is_cancelled()) {
     
                         $created = false;
                         if (!$exists) {
+                            // Call remote user creation function locally using bounce effect.
                             if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, $userobj, '', $propagatedhost, true)) {
                                 $response = json_decode($return);
+
                                 if (empty($response)) {
                                     debugging(print_object($return), DEBUG_DEVELOPER);
                                 }
+
                                 if ($response->status != 200) {
                                     debugging(print_object($response), DEBUG_DEVELOPER);
                                 } else {

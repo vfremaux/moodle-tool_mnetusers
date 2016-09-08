@@ -73,7 +73,7 @@ if (!$form->is_cancelled()){
         $caller->username = $USER->username;
         $userhostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $caller->remoteuserhostroot = $userhostroot;
-        $caller->remotehostroot = $CFG->wwwroot;     
+        $caller->remotehostroot = $CFG->wwwroot;
         if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, (array)$userobj, '', $bounceto, false)){
             $response = json_decode($return);
             if ($response->status != RPC_SUCCESS){
@@ -83,17 +83,17 @@ if (!$form->is_cancelled()){
             $output .= "XML RPC Direct Call Error";
         }
         $needsdisplay = false;
-        $output .= $OUTPUT->continue_button($CFG->wwwroot.'/admin/index.php');
+        $output .= $OUTPUT->continue_button(new moodle_url('/admin/index.php'));
    }
 }
 
 echo $OUTPUT->header();
 echo $OUTPUT->box_start('generalbox', '80%');
 
-if (!empty($output)){
-	echo $OUTPUT->box_start('generalbox', '80%');
-	echo $output;
-	echo $OUTPUT->box_end();
+if (!empty($output)) {
+    echo $OUTPUT->box_start('generalbox', '80%');
+    echo $output;
+    echo $OUTPUT->box_end();
 }
 
 if ($needsdisplay){
