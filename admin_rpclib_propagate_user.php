@@ -66,9 +66,10 @@ if (!$form->is_cancelled()) {
                         $output .= get_string('propagating', 'tool_mnetusers', fullname($userobj));
                         $userhost = $DB->get_record('mnet_host', array('id' => $USER->mnethostid));
                         $caller = new StdClass();
+                        $usermnethostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
                         $caller->username = $USER->username;
-                        $caller->remoteuserhostroot = $CFG->wwwroot;
-                        $caller->remotehostroot = $CFG->wwwroot;
+                        $caller->remoteuserhostroot = $usermnethostroot;
+                        $caller->remotehostroot = $usermnethostroot;
         
                         // check if exists
                         $exists = false;
