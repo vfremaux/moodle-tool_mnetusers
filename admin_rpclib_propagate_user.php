@@ -70,7 +70,7 @@ if (!$form->is_cancelled()) {
                         $caller->username = $USER->username;
                         $caller->remoteuserhostroot = $usermnethostroot;
                         $caller->remotehostroot = $usermnethostroot;
-        
+
                         // check if exists
                         $exists = false;
                         if ($return = mnetadmin_rpc_user_exists($caller, $userobj->username, $propagatedhost, true)) {
