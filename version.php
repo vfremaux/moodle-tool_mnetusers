@@ -1,4 +1,4 @@
-<?php // $Id: version.php,v 1.2 2013-01-18 16:26:59 vf Exp $
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,22 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This tool allows easily propagate and maange remote users
+ * Version details.
  *
- * @package    tool_mnetusers
- * @copyright  2013 Valery Fremaux
- * @author     Valery Fremaux
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     tool_mnetusers
+ * @category    tool
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   2013 onwards Valery Fremaux (http://www.mylearningfactory.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016040300;
-$plugin->requires  = 2016112900; // Requires this Moodle version.
+$plugin->version  = 2013072000;
+$plugin->requires  = 2014050800; // Requires this Moodle version.
 $plugin->component = 'tool_mnetusers';  // Full name of the plugin (used for diagnostics).
 $plugin->cron      = 0;
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '3.2.0 (Build 2013072000)';
+$plugin->release = '2.7.0 (Build 2013072000)';
 
 // Non moodle attributes.
-$plugin->codeincrement = '3.2.0001';
+$plugin->codeincrement = '2.7.0000';

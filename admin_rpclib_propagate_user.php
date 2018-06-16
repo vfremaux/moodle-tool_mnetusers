@@ -19,7 +19,6 @@
  * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
  */
 require('../../../config.php');
 require_once($CFG->dirroot.'/admin/tool/mnetusers/admin_user_choice_form.php');
@@ -50,7 +49,7 @@ $PAGE->set_title($useradvancedstr);
 
 $form = new User_Choice_Form();
 
-/// get available mnet_hosts
+// Get available mnet_hosts.
 
 $output = '';
 
@@ -71,7 +70,7 @@ if (!$form->is_cancelled()) {
                         $caller->remoteuserhostroot = $usermnethostroot;
                         $caller->remotehostroot = $usermnethostroot;
 
-                        // check if exists
+                        // Check if exists.
                         $exists = false;
                         if ($return = mnetadmin_rpc_user_exists($caller, $userobj->username, $propagatedhost, true)) {
                             $response = json_decode($return);
@@ -94,20 +93,23 @@ if (!$form->is_cancelled()) {
     
                         $created = false;
                         if (!$exists) {
+                            // Call remote user creation function locally using bounce effect.
                             if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, $userobj, '', $propagatedhost, true)) {
                                 $response = json_decode($return);
+
                                 if (empty($response)) {
                                     debugging(print_object($return), DEBUG_DEVELOPER);
                                 }
+
                                 if ($response->status != 200) {
                                     debugging(print_object($response), DEBUG_DEVELOPER);
                                 } else {
                                     $created = true;
 
                                     /** in case we have user_mnet_hosts, give them logical access */
-                                    if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')){
+                                    if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')) {
                                         include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                                        if ($result = user_mnet_hosts_add_access($userobj, $propagatedhost)){
+                                        if ($result = user_mnet_hosts_add_access($userobj, $propagatedhost)) {
                                             $output .= '<br/>'.$result;
                                         }
                                     }
@@ -117,16 +119,16 @@ if (!$form->is_cancelled()) {
 
                         if ($exists || $created) {
                             if (!empty($data->unassign)) {
-                                $data->role = '-'.$data->role; // send unassign sign
+                                $data->role = '-'.$data->role; // Send unassign sign.
                             }
 
                             if (!empty($data->addsiteadmin)) {
-                                $data->role = '+'.$data->role; // send site admin addition
+                                $data->role = '+'.$data->role; // Send site admin addition.
                             }
     
                             $rpc_client = new mnet_xmlrpc_client();
                             $rpc_client->set_method('blocks/vmoodle/plugins/roles/rpclib.php/mnetadmin_rpc_assign_role');
-                            $rpc_client->add_param($caller, 'struct'); // username
+                            $rpc_client->add_param($caller, 'struct'); // Username.
                             $rpc_client->add_param($userobj->username, 'string');
                             $rpc_client->add_param($data->role, 'string');
 
@@ -134,7 +136,6 @@ if (!$form->is_cancelled()) {
                             if ($mnet_host->set_wwwroot($propagatedhost)) {
                                 $result = $rpc_client->send($mnet_host);
                                 if (empty($result)) {
-                                    // if (preg_match('/dev/', $CFG->wwwroot)) print_object($rpc_client);
                                     $response->errors[] = ' remote failed assign in '.$propagatedhost;
                                     if (is_array($rpc_client->error)) {
                                         $response->errors += $rpc_client->error;
@@ -190,4 +191,3 @@ if ($needsdisplay) {
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
-

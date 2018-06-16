@@ -19,7 +19,6 @@
  * @category  tool
  * @author    Valery Fremaux <valery.fremaux@gmail.com>
  */
-
 require('../../../../config.php');
 
 // Security.
@@ -29,9 +28,11 @@ require_capability('moodle/site:config', context_system::instance());
 
 $filter = optional_param('filter', '', PARAM_TEXT);
 
-$filterclause = (!empty($filter)) ? " AND lastname LIKE '%$filter%' " : '' ;
+$filterclause = (!empty($filter)) ? " AND lastname LIKE '%$filter%' " : '';
 
-if ($users = $DB->get_records_select('user', " deleted = 0 AND mnethostid = ? $filterclause", array($CFG->mnet_localhost_id), 'username', 'id, '.get_all_user_name_fields(true, 'u'))) {
+$select = " deleted = 0 AND mnethostid = ? $filterclause";
+$fields = 'id, '.get_all_user_name_fields(true, 'u');
+if ($users = $DB->get_records_select('user', $select, array($CFG->mnet_localhost_id), 'username', $fields)) {
     foreach ($users as $user) {
         $useropts[$user->id] = fullname($user);
     }
