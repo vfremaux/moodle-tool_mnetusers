@@ -14,27 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * @package   tool_mnetusers
  * @category  tool
  * @author    Valery Fremaux <valery.fremaux@gmail.com>
  */
-defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
 class User_Choice_Form extends moodleform {
 
-    public function definition() {
+    function definition() {
         global $CFG, $DB;
 
         $mform = $this->_form;
 
-        $select = " deleted = 0 AND mnethostid = ? ";
-        $fields = 'id,'.get_all_user_name_fields(true, '');
-        $users = $DB->get_records_select('user', $select, array($CFG->mnet_localhost_id), 'lastname,firstname', $fields);
+        $users = $DB->get_records_select('user', " deleted = 0 AND mnethostid = ? ", array($CFG->mnet_localhost_id), 'lastname,firstname', 'id,'.get_all_user_name_fields(true, ''));
 
-        $hosts = $DB->get_records_select('mnet_host', ' deleted = 0 AND applicationid = 1 ', array());
+        $hosts = $DB->get_records_select('mnet_host', " deleted = 0 AND applicationid = 1 ", array());
 
         $hostsopt = array();
 
@@ -42,7 +41,7 @@ class User_Choice_Form extends moodleform {
         $mform->setType('sesskey', PARAM_RAW);
 
         foreach($hosts as $host) {
-            if (!empty($host->wwwroot) && ($host->wwwroot != $CFG->wwwroot)) {
+            if (!empty($host->wwwroot) && $host->wwwroot != $CFG->wwwroot) {
                 $hostsopt[$host->wwwroot] = $host->name;
             }
         }
@@ -77,8 +76,7 @@ class User_Choice_Form extends moodleform {
             }
             array_unshift($roleoptions, get_string('none'));
             $group = array();
-            $label = get_string('checklocalroleadvice', 'tool_mnetusers');
-            $group[] = & $mform->createElement('select', 'role', $label, $roleoptions);
+            $group[] = & $mform->createElement('select', 'role', get_string('checklocalroleadvice', 'tool_mnetusers'), $roleoptions);
             $group[] = & $mform->createElement('checkbox', 'unassign', 0, get_string('unassign', 'tool_mnetusers'), 0);
             $mform->addGroup($group, 'group1', ' ', '', false);
 

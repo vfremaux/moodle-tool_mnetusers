@@ -19,6 +19,7 @@
  * @category  tool
  * @author    Valery Fremaux <valery.fremaux@gmail.com>
  */
+
 require('../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
 include_once($CFG->dirroot.'/user/editadvanced_form.php');
@@ -46,7 +47,7 @@ $PAGE->set_title($useradvancedstr);
 
 $form = new user_editadvanced_form();
 
-// Get available mnet_hosts.
+/// get available mnet_hosts
 
 $hosts = $DB->get_records_select('mnet_host', " deleted = 0 AND applicationid = 1 ", array());
 $hostopt = array();
@@ -61,38 +62,38 @@ $fselect->setMultiple(true);
 
 $ouptut = '';
 
-if (!$form->is_cancelled()) {
-    if ($userobj = $form->get_data()) {
+if (!$form->is_cancelled()){
+    if ($userobj = $form->get_data()){
         $output .= "creating user with RPC cascade";
         $bounceto = implode(';', $userobj->bounce);
         unset($userobj->bounce);
 
-        // Invoke local XML-RPC mnetadmin-rpc_create_user call.
+        // invoke local XML-RPC mnetadmin-rpc_create_user call
         $caller = new StdClass();
         $caller->username = $USER->username;
         $userhostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $caller->remoteuserhostroot = $userhostroot;
-        $caller->remotehostroot = $CFG->wwwroot;
+        $caller->remotehostroot = $CFG->wwwroot;     
         if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, (array)$userobj, '', $bounceto, false)){
             $response = json_decode($return);
             if ($response->status != RPC_SUCCESS){
-                throw new moodle_exception("RPC Failure");
+                if(debugging(DEBUG_DEVELOPER)) print_object($response);
             }
         } else {
             $output .= "XML RPC Direct Call Error";
         }
         $needsdisplay = false;
-        $output .= $OUTPUT->continue_button(new moodle_url('/admin/index.php'));
+        $output .= $OUTPUT->continue_button($CFG->wwwroot.'/admin/index.php');
    }
 }
 
 echo $OUTPUT->header();
 echo $OUTPUT->box_start('generalbox', '80%');
 
-if (!empty($output)) {
-    echo $OUTPUT->box_start('generalbox', '80%');
-    echo $output;
-    echo $OUTPUT->box_end();
+if (!empty($output)){
+	echo $OUTPUT->box_start('generalbox', '80%');
+	echo $output;
+	echo $OUTPUT->box_end();
 }
 
 if ($needsdisplay){
