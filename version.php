@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * This tool allows easily propagate and maange remote users
  *
  * @package    tool_mnetusers
- * @copyright  2013 Valery Fremaux 
+ * @copyright  2013 Valery Fremaux
  * @author     Valery Fremaux
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,10 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version  = 2016090800;
-$plugin->requires  = 2015050500; // Requires this Moodle version.
+$plugin->requires  = 2015111100; // Requires this Moodle version.
 $plugin->component = 'tool_mnetusers';  // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_RC;
-$plugin->release = '2.9.0 (Build 2016090800)';
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = '3.0.0 (Build 2016090800)';
 
 // Non moodle attributes.
-$plugin->codeincrement = '2.9.0001';
+$plugin->codeincrement = '3.0.0001';

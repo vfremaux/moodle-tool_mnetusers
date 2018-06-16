@@ -14,24 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package   tool_mnetusers
  * @category  tool
  * @author    Valery Fremaux <valery.fremaux@gmail.com>
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
 class User_Choice_Form extends moodleform {
 
-    function definition() {
+    public function definition() {
         global $CFG, $DB;
 
         $mform = $this->_form;
 
-        $users = $DB->get_records_select('user', " deleted = 0 AND mnethostid = ? ", array($CFG->mnet_localhost_id), 'lastname,firstname', 'id,'.get_all_user_name_fields(true, ''));
+        $select = " deleted = 0 AND mnethostid = ? ";
+        $fields = 'id,'.get_all_user_name_fields(true, '');
+        $numusers = $DB->count_records_select('user', $select, array($CFG->mnet_localhost_id));
+
+        $users = $DB->get_records_select('user', $select, array($CFG->mnet_localhost_id), 'lastname,firstname', $fields, 0, 100);
 
         $hosts = $DB->get_records_select('mnet_host', " deleted = 0 AND applicationid = 1 ", array());
 
@@ -40,7 +43,7 @@ class User_Choice_Form extends moodleform {
         $mform->addElement('hidden', 'sesskey', sesskey());
         $mform->setType('sesskey', PARAM_RAW);
 
-        foreach($hosts as $host) {
+        foreach ($hosts as $host) {
             if (!empty($host->wwwroot) && $host->wwwroot != $CFG->wwwroot) {
                 $hostsopt[$host->wwwroot] = $host->name;
             }
@@ -53,12 +56,16 @@ class User_Choice_Form extends moodleform {
                 $usersopts[$user->id] = fullname($user);
             }
 
-            $attrs = array( 'onchange' => "refreshuserlist('{$CFG->wwwroot}', this);", 'size' => 15);
+            $attrs = array( 'onchange' => "refreshuserlist(this);", 'size' => 15);
             $select = & $mform->addElement('text', 'filter', get_string('filter', 'tool_mnetusers'), $attrs);
             $mform->setType('filter', PARAM_TEXT);
 
             $select = & $mform->addElement('select', 'users', '', $usersopts);
             $select->setMultiple(true);
+
+            if ($numusers > count($users)) {
+                $mform->addElement('static', 'overcountadvice', '', get_string('moreusersusefilter', 'tool_mnetusers'));
+            }
 
             $select = & $mform->addElement('header', 'head2', get_string('choosemnethosts', 'tool_mnetusers'));
             $mform->setExpanded('head2');
@@ -76,7 +83,8 @@ class User_Choice_Form extends moodleform {
             }
             array_unshift($roleoptions, get_string('none'));
             $group = array();
-            $group[] = & $mform->createElement('select', 'role', get_string('checklocalroleadvice', 'tool_mnetusers'), $roleoptions);
+            $label = get_string('checklocalroleadvice', 'tool_mnetusers');
+            $group[] = & $mform->createElement('select', 'role', $label, $roleoptions);
             $group[] = & $mform->createElement('checkbox', 'unassign', 0, get_string('unassign', 'tool_mnetusers'), 0);
             $mform->addGroup($group, 'group1', ' ', '', false);
 

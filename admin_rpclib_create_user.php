@@ -22,10 +22,10 @@
 
 require('../../../config.php');
 require_once($CFG->libdir.'/adminlib.php');
-include_once($CFG->dirroot.'/user/editadvanced_form.php');
+require_once($CFG->dirroot.'/user/editadvanced_form.php');
 require_once($CFG->dirroot.'/user/editlib.php');
 require_once($CFG->dirroot.'/user/profile/lib.php');
-require_once($CFG->dirroot.'/blocks/vmoodle/rpclib.php');
+require_once($CFG->dirroot.'/local/vmoodle/rpclib.php');
 
 $needsdisplay = true;
 
@@ -47,13 +47,15 @@ $PAGE->set_title($useradvancedstr);
 
 $form = new user_editadvanced_form();
 
-/// get available mnet_hosts
+// Get available mnet_hosts.
 
 $hosts = $DB->get_records_select('mnet_host', " deleted = 0 AND applicationid = 1 ", array());
 $hostopt = array();
-foreach($hosts as $host){
-    if (!empty($host->wwwroot) && $host->wwwroot != $CFG->wwwroot)
+
+foreach ($hosts as $host) {
+    if (!empty($host->wwwroot) && $host->wwwroot != $CFG->wwwroot) {
         $hostopt[$host->wwwroot] = $host->name;
+    }
 }
 
 $form->_form->addElement('static', 'bouncelabel', get_string('targetremotehost', 'local'));
@@ -62,22 +64,22 @@ $fselect->setMultiple(true);
 
 $ouptut = '';
 
-if (!$form->is_cancelled()){
-    if ($userobj = $form->get_data()){
+if (!$form->is_cancelled()) {
+    if ($userobj = $form->get_data()) {
         $output .= "creating user with RPC cascade";
         $bounceto = implode(';', $userobj->bounce);
         unset($userobj->bounce);
 
-        // invoke local XML-RPC mnetadmin-rpc_create_user call
+        // Invoke local XML-RPC mnetadmin-rpc_create_user call.
         $caller = new StdClass();
         $caller->username = $USER->username;
         $userhostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
         $caller->remoteuserhostroot = $userhostroot;
-        $caller->remotehostroot = $CFG->wwwroot;     
-        if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, (array)$userobj, '', $bounceto, false)){
+        $caller->remotehostroot = $CFG->wwwroot;
+        if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, (array)$userobj, '', $bounceto, false)) {
             $response = json_decode($return);
-            if ($response->status != RPC_SUCCESS){
-                if(debugging(DEBUG_DEVELOPER)) print_object($response);
+            if ($response->status != RPC_SUCCESS) {
+                $output .= "XML RPC Remote Function Error";
             }
         } else {
             $output .= "XML RPC Direct Call Error";
@@ -90,13 +92,13 @@ if (!$form->is_cancelled()){
 echo $OUTPUT->header();
 echo $OUTPUT->box_start('generalbox', '80%');
 
-if (!empty($output)){
-	echo $OUTPUT->box_start('generalbox', '80%');
-	echo $output;
-	echo $OUTPUT->box_end();
+if (!empty($output)) {
+    echo $OUTPUT->box_start('generalbox', '80%');
+    echo $output;
+    echo $OUTPUT->box_end();
 }
 
-if ($needsdisplay){
+if ($needsdisplay) {
     $form->display();
 }
 

@@ -31,7 +31,9 @@ $filter = optional_param('filter', '', PARAM_TEXT);
 
 $filterclause = (!empty($filter)) ? " AND lastname LIKE '%$filter%' " : '' ;
 
-if ($users = $DB->get_records_select('user', " deleted = 0 AND mnethostid = ? $filterclause", array($CFG->mnet_localhost_id), 'username', 'id, '.get_all_user_name_fields(true, 'u'))) {
+$select = " deleted = 0 AND mnethostid = ? $filterclause";
+
+if ($users = $DB->get_records_select('user', $select, array($CFG->mnet_localhost_id), 'username', 'id, '.get_all_user_name_fields(true, ''))) {
     foreach ($users as $user) {
         $useropts[$user->id] = fullname($user);
     }
