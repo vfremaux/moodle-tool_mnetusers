@@ -17,20 +17,19 @@
 /**
  * Version details.
  *
- * @package     tool_mnetusers
- * @category    tool
- * @author      Valery Fremaux <valery.fremaux@gmail.com>
- * @copyright   2013 onwards Valery Fremaux (http://www.mylearningfactory.com)
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    tool_mnetusers
+ * @copyright  2013 Valery Fremaux 
+ * @author     Valery Fremaux
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2013072000;
-$plugin->requires  = 2014110400; // Requires this Moodle version.
+$plugin->version  = 2016090800;
+$plugin->requires  = 2015050500; // Requires this Moodle version.
 $plugin->component = 'tool_mnetusers';  // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = '2.8.0 (Build 2013072000)';
+$plugin->maturity = MATURITY_RC;
+$plugin->release = '2.9.0 (Build 2016090800)';
 
 // Non moodle attributes.
-$plugin->codeincrement = '2.8.0000';
+$plugin->codeincrement = '2.9.0001';
