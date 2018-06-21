@@ -25,12 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016040300;
+$plugin->version  = 2016090800;
 $plugin->requires  = 2016112900; // Requires this Moodle version.
 $plugin->component = 'tool_mnetusers';  // Full name of the plugin (used for diagnostics).
 $plugin->cron      = 0;
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '3.2.0 (Build 2013072000)';
+$plugin->release = '3.2.0 (Build 2016090800)';
 
 // Non moodle attributes.
 $plugin->codeincrement = '3.2.0001';

@@ -26,14 +26,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// settings default init.
 if (is_dir($CFG->dirroot.'/local/adminsettings')) {
-    list($hasconfig, $hassiteconfig) = local_adminsettings_access();
+    // Integration driven code.
+    require_once($CFG->dirroot.'/local/adminsettings/lib.php');
+    list($hasconfig, $hassiteconfig, $capability) = local_adminsettings_access();
 } else {
-    // Standard Moodle code
-    $hasconfig = $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+    // Standard Moodle code.
+    $capability = 'moodle/site:config';
+    $hasconfig = $hassiteconfig = has_capability($capability, context_system::instance());
 }
 
-if ($hassiteconfig) {
-    //--- general settings -----------------------------------------------------------------------------------
-    $ADMIN->add('mnet', new admin_externalpage('toolmnetusers', get_string('pluginname', 'tool_mnetusers'), "{$CFG->wwwroot}/admin/tool/mnetusers/admin_rpclib_propagate_user.php"));
+if ($CFG->mnet_dispatcher_mode != 'off') {
+    if ($hasconfig) {
+        //--- general settings -----------------------------------------------------------------------------------
+        $ADMIN->add('accounts', new admin_externalpage('toolmnetusers', get_string('pluginname', 'tool_mnetusers'), "{$CFG->wwwroot}/admin/tool/mnetusers/admin_rpclib_propagate_user.php"));
+    }
 }

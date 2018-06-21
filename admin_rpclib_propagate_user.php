@@ -23,7 +23,8 @@
  */
 require('../../../config.php');
 require_once($CFG->dirroot.'/admin/tool/mnetusers/admin_user_choice_form.php');
-require_once($CFG->dirroot.'/blocks/vmoodle/rpclib.php');
+require_once($CFG->dirroot.'/admin/tool/mnetusers/locallib.php');
+require_once($CFG->dirroot.'/local/vmoodle/rpclib.php');
 require_once($CFG->dirroot.'/mnet/xmlrpc/client.php');
 
 $needsdisplay = true;
@@ -50,7 +51,7 @@ $PAGE->set_title($useradvancedstr);
 
 $form = new User_Choice_Form();
 
-/// get available mnet_hosts
+// Get available mnet_hosts.
 
 $output = '';
 
@@ -60,103 +61,7 @@ if (!$form->is_cancelled()) {
             if (!empty($data->nodes)) {
                 foreach ($data->nodes as $propagatedhost) {
                     foreach ($data->users as $userid) {
-                        $userobj = $DB->get_record('user', array('id' => $userid));
-                        $userobj->auth = 'mnet';
-                        $userobj->password = '';
-                        $output .= get_string('propagating', 'tool_mnetusers', fullname($userobj));
-                        $userhost = $DB->get_record('mnet_host', array('id' => $USER->mnethostid));
-                        $caller = new StdClass();
-                        $usermnethostroot = $DB->get_field('mnet_host', 'wwwroot', array('id' => $USER->mnethostid));
-                        $caller->username = $USER->username;
-                        $caller->remoteuserhostroot = $usermnethostroot;
-                        $caller->remotehostroot = $usermnethostroot;
-
-                        // check if exists
-                        $exists = false;
-                        if ($return = mnetadmin_rpc_user_exists($caller, $userobj->username, $propagatedhost, true)) {
-                            $response = json_decode($return);
-                            if (empty($response)) {
-                                debugging(print_object($return), DEBUG_DEVELOPER);
-                            }
-                            if ($response->status != 200 || empty($response->user)) {
-                                $output .= "-&gt; {$userobj->username} did not exist. Will create it.\n<br/>";
-                                $exists = false;
-                            } else {
-                                if (!empty($response->user->deleted)) {
-                                    $output .= "-&gt; {$userobj->username} was there but deleted. Reviving \n<br/>";
-                                    $exists = false;
-                                } else {
-                                    $output .= "-&gt; {$userobj->username} was there \n<br/>";
-                                    $exists = true;
-                                }
-                            }
-                        }
-    
-                        $created = false;
-                        if (!$exists) {
-                            if ($return = mnetadmin_rpc_create_user($caller, $userobj->username, $userobj, '', $propagatedhost, true)) {
-                                $response = json_decode($return);
-                                if (empty($response)) {
-                                    debugging(print_object($return), DEBUG_DEVELOPER);
-                                }
-                                if ($response->status != 200) {
-                                    debugging(print_object($response), DEBUG_DEVELOPER);
-                                } else {
-                                    $created = true;
-
-                                    /** in case we have user_mnet_hosts, give them logical access */
-                                    if (file_exists($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php')){
-                                        include_once($CFG->dirroot.'/blocks/user_mnet_hosts/xlib.php');
-                                        if ($result = user_mnet_hosts_add_access($userobj, $propagatedhost)){
-                                            $output .= '<br/>'.$result;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if ($exists || $created) {
-                            if (!empty($data->unassign)) {
-                                $data->role = '-'.$data->role; // send unassign sign
-                            }
-
-                            if (!empty($data->addsiteadmin)) {
-                                $data->role = '+'.$data->role; // send site admin addition
-                            }
-    
-                            $rpc_client = new mnet_xmlrpc_client();
-                            $rpc_client->set_method('blocks/vmoodle/plugins/roles/rpclib.php/mnetadmin_rpc_assign_role');
-                            $rpc_client->add_param($caller, 'struct'); // username
-                            $rpc_client->add_param($userobj->username, 'string');
-                            $rpc_client->add_param($data->role, 'string');
-
-                            $mnet_host = new mnet_peer();
-                            if ($mnet_host->set_wwwroot($propagatedhost)) {
-                                $result = $rpc_client->send($mnet_host);
-                                if (empty($result)) {
-                                    // if (preg_match('/dev/', $CFG->wwwroot)) print_object($rpc_client);
-                                    $response->errors[] = ' remote failed assign in '.$propagatedhost;
-                                    if (is_array($rpc_client->error)) {
-                                        $response->errors += $rpc_client->error;
-                                    }
-                                    $response->error = ' remote failed assign in '.$propagatedhost;
-                                } else {
-                                    // Whatever we have, aggregate eventual remote errors to error stack.
-                                    $response = json_decode($rpc_client->response);
-                                    if ($response->status == 200) {
-                                        $output .= $response->message."<br/>\n";
-                                    } else {
-                                        if (!empty($response->errors)) {
-                                            foreach ($response->errors as $remoteerror) {
-                                                $response->errors[] = $remoteerror;
-                                            }
-                                            $response->error = ' remote failed assign in '.$propagatedhost;
-                                            debugging(print_object($response->errors), DEBUG_DEVELOPER);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        $output .= propagate_user($userid, $propagatedhost, $data);
                         $output .= '<br/>';
                     }
                 }
