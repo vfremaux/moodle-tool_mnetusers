@@ -1,4 +1,4 @@
-<?php // $Id: version.php,v 1.2 2013-01-18 16:26:59 vf Exp $
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,23 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This tool allows easily propagate and maange remote users
- *
- * @package    tool_mnetusers
- * @copyright  2013 Valery Fremaux
- * @author     Valery Fremaux
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace tool_mnetusers\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2016090800;
-$plugin->requires  = 2017110800; // Requires this Moodle version.
-$plugin->component = 'tool_mnetusers';  // Full name of the plugin (used for diagnostics).
-$plugin->cron      = 0;
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = '3.4.0 (Build 2016090800)';
-
-// Non moodle attributes.
-$plugin->codeincrement = '3.4.0001';
+class provider implements \core_privacy\local\metadata\null_provider {
+}
