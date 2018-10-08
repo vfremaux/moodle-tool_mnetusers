@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// Privacy.
+$string['privacy:metadata'] = 'L\'outil de Propagation des Utilisateurs Réseau ne détient directement aucune donnée relative aux utilisateurs.';
+
 $string['pluginname'] = 'Propagation de comptes utilisateur';
 $string['nothingtopropagate'] = 'Rien à propager';
 $string['propagate'] = 'Propagation';
