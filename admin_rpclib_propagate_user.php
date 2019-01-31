@@ -57,6 +57,12 @@ $output = '';
 
 if (!$form->is_cancelled()) {
     if ($data = $form->get_data()) {
+
+        // Uggly fix when users disappear between _POST and form input :
+        if (!empty($_POST['users'])) {
+            $data->users = $_POST['users'];
+        }
+
         if (!empty($data->users)) {
             if (!empty($data->nodes)) {
                 foreach ($data->nodes as $propagatedhost) {
